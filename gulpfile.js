@@ -1,19 +1,19 @@
 /*
- * This file is part of Invenio.
+ * This file is part of CERN Document Server.
  * Copyright (C) 2016 CERN.
  *
- * Invenio is free software; you can redistribute it and/or
+ * CERN Document Server is free software; you can redistribute it and/or
  * modify it under the terms of the GNU General Public License as
  * published by the Free Software Foundation; either version 2 of the
  * License, or (at your option) any later version.
  *
- * Invenio is distributed in the hope that it will be useful, but
+ * CERN Document Server is distributed in the hope that it will be useful, but
  * WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with Invenio; if not, write to the Free Software Foundation, Inc.,
+ * along with CERN Document Server; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307, USA.
  *
  * In applying this license, CERN does not
@@ -69,7 +69,7 @@ var lintFiles = [
  */
 
 // run all the build tasks
-gulp.task('build', ['clean.build'], function (done) {
+gulp.task('build', ['clean.build'], function(done) {
   runSequence(
     'build.src', 'build.templates', done
   );
@@ -79,10 +79,10 @@ gulp.task('build', ['clean.build'], function (done) {
 gulp.task('build.src', function() {
   gulp.src(sourceFiles)
     .pipe(plugins.plumber())
-    .pipe(plugins.concat('invenio-search-js.js'))
+    .pipe(plugins.concat('cds.js'))
     .pipe(gulp.dest('./dist/'))
     .pipe(plugins.uglify())
-    .pipe(plugins.rename('invenio-search-js.min.js'))
+    .pipe(plugins.rename('cds.min.js'))
     .pipe(plugins.header(licences.javascript))
     .pipe(gulp.dest('./dist'));
 });
@@ -99,12 +99,12 @@ gulp.task('build.templates', function() {
  */
 
 // Run test once and exit
-gulp.task('test', function (done) {
+gulp.task('test', function(done) {
   runSequence('test.jshint', 'test.src', done);
 });
 
 // check jshint
-gulp.task('test.jshint', function () {
+gulp.task('test.jshint', function() {
   return gulp.src(lintFiles)
     .pipe(plugins.plumber())
     .pipe(plugins.jshint())
@@ -113,7 +113,7 @@ gulp.task('test.jshint', function () {
 });
 
 // test sources
-gulp.task('test.src', function (done) {
+gulp.task('test.src', function(done) {
   karma.start({
     configFile: __dirname + '/karma-src.conf.js',
     singleRun: true
@@ -121,7 +121,7 @@ gulp.task('test.src', function (done) {
 });
 
 // coveralls
-gulp.task('coveralls', function () {
+gulp.task('coveralls', function() {
   return gulp.src('coverage/**/lcov.info')
     .pipe(plugins.coveralls());
 });
@@ -152,7 +152,7 @@ gulp.task('clean.build', function() {
  * Watch
  */
 
-gulp.task('watch', function () {
+gulp.task('watch', function() {
   // Watch JavaScript files
   gulp.watch(sourceFiles, ['test']);
 });
@@ -161,6 +161,6 @@ gulp.task('watch', function () {
  * Default taks
  */
 
-gulp.task('default', function () {
+gulp.task('default', function() {
   runSequence('test', 'watch');
 });

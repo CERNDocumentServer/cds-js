@@ -1,20 +1,20 @@
 # -*- coding: utf-8 -*-
 #
-# This file is part of Invenio.
+# This file is part of CERN Document Server.
 # Copyright (C) 2016 CERN.
 #
-# Invenio is free software; you can redistribute it
+# CERN Document Server is free software; you can redistribute it
 # and/or modify it under the terms of the GNU General Public License as
 # published by the Free Software Foundation; either version 2 of the
 # License, or (at your option) any later version.
 #
-# Invenio is distributed in the hope that it will be
+# CERN Document Server is distributed in the hope that it will be
 # useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
 # General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with Invenio; if not, write to the
+# along with CERN Document Server; if not, write to the
 # Free Software Foundation, Inc., 59 Temple Place, Suite 330, Boston,
 # MA 02111-1307, USA.
 #
@@ -36,9 +36,9 @@ rm -rf gh-pages/*.html gh-pages/styles gh-pages/scripts
 cp -r docs/* gh-pages
 cd gh-pages
 
-# set the user to invenio-developer
-git config user.name "UPDATE_WITH_DOCS_USER"
-git config user.email "UPDATE_WITH_DOCS_USER_EMAIL"
+# set the user to CERN Document Server-developer
+git config user.name "Harris Tzovanakis"
+git config user.email "me@drjova.com"
 
 # add and commit
 git add .

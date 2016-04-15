@@ -1,10 +1,10 @@
 {
-  "name": "cds-app",
+  "name": "cds",
   "version": "0.0.1",
   "description": "Angualar App for CDS",
   "author": {
     "name": "CERN",
-    "email": "info@invenio-software.org"
+    "email": "cds-support@cern.ch"
   },
   "repository": {
     "type": "git",
@@ -23,10 +23,13 @@
     "gulp": "^3.8.7",
     "gulp-concat": "^2.3.4",
     "gulp-coveralls": "^0.1.4",
+    "gulp-exclude-gitignore": "^1.0.0",
     "gulp-flatten": "^0.2.0",
     "gulp-header": "^1.7.1",
+    "gulp-istanbul": "^0.10.4",
     "gulp-jshint": "^1.8.4",
     "gulp-load-plugins": "^1.1.0",
+    "gulp-mocha": "^2.2.0",
     "gulp-plumber": "^0.6.6",
     "gulp-rename": "^1.2.0",
     "gulp-uglify": "^0.3.1",
