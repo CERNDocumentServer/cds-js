@@ -30,7 +30,7 @@
     * @description
     *    CDS record controller.
     */
-  function cdsRecordController($scope) {
+  function cdsRecordController($scope, $sce) {
 
     // Parameters
 
@@ -49,6 +49,17 @@
     ////////////
 
     // Functions
+
+    /**
+      * Trust iframe url
+      * @memberof cdsRecordController
+      * @function cdsRecordIframe
+      * @param {String} url - The url.
+      */
+    function cdsRecordIframe(url) {
+      // Return the trusted url
+      return $sce.trustAsResourceUrl(url);
+    }
 
     /**
       * When the module initialized
@@ -113,6 +124,13 @@
 
     ////////////
 
+    // Assignements
+
+    // Iframe src
+    vm.iframeSrc = cdsRecordIframe;
+
+    ////////////
+
     // Listeners
 
     // When the module initialized
@@ -129,7 +147,7 @@
     $scope.$on('cds.record.loading.stop', cdsRecordLoadingStop);
   }
 
-  cdsRecordController.$inject = ['$scope'];
+  cdsRecordController.$inject = ['$scope', '$sce'];
 
   ////////////
 

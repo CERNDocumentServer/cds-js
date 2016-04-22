@@ -95,6 +95,10 @@ describe('Unit: testing controllers', function() {
 
     // Expect loading to be ``false``
     expect(ctrl.cdsRecordLoading).to.be.equal(false);
+
+    // Expect the url to be ``object``
+    var url = ctrl.iframeSrc('suicide squad://Harlay Quinn');
+    expect(typeof url).to.be.equal('object');
   });
 
 });
