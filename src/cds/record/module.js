@@ -165,7 +165,7 @@
     *     template='TEMPLATE_PATH'>
     *    </cds-record-view>
     */
-  function cdsRecordView() {
+  function cdsRecordView($http) {
 
     // Functions
 
@@ -184,8 +184,15 @@
         // Broadcast the love
         scope.$broadcast('cds.record.init');
       } catch(error) {
-        // Throw the error
-        scope.$broadcast('cds.record.error', error);
+        $http.get(attrs.record)
+          .then(function(response) {
+            scope.record = response.data;
+            // Broadcast
+            scope.$broadcast('cds.record.init');
+          }, function(error) {
+            // Throw the error
+            scope.$broadcast('cds.record.error', error);
+          });
       }
     }
 
@@ -214,7 +221,7 @@
     };
   }
 
-  cdsRecordView.$inject = [];
+  cdsRecordView.$inject = ['$http'];
 
   ////////////
 
