@@ -184,15 +184,19 @@
         // Broadcast the love
         scope.$broadcast('cds.record.init');
       } catch(error) {
-        $http.get(attrs.record)
-          .then(function(response) {
-            scope.record = response.data;
-            // Broadcast
-            scope.$broadcast('cds.record.init');
-          }, function(error) {
-            // Throw the error
-            scope.$broadcast('cds.record.error', error);
-          });
+        if ((attrs.record || '').charAt(0) === '/') {
+          $http.get(attrs.record)
+            .then(function(response) {
+              scope.record = response.data;
+              // Broadcast
+              scope.$broadcast('cds.record.init');
+            }, function(error) {
+              // Throw the error
+              scope.$broadcast('cds.record.error', error);
+            });
+        } else {
+          scope.$broadcast('cds.record.error', error);
+        }
       }
     }
 
