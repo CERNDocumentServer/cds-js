@@ -165,7 +165,7 @@
     *     template='TEMPLATE_PATH'>
     *    </cds-record-view>
     */
-  function cdsRecordView($http) {
+  function cdsRecordView($http, $sce) {
 
     // Functions
 
@@ -190,6 +190,9 @@
               scope.record = response.data;
               // Broadcast
               scope.$broadcast('cds.record.init');
+              // Already escaped description
+              var description = scope.record.metadata.description.value;
+              scope.escapedDescription = $sce.trustAsHtml(description);
             }, function(error) {
               // Throw the error
               scope.$broadcast('cds.record.error', error);
@@ -225,7 +228,7 @@
     };
   }
 
-  cdsRecordView.$inject = ['$http'];
+  cdsRecordView.$inject = ['$http', '$sce'];
 
   ////////////
 
