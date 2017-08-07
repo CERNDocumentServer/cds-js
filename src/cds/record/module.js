@@ -181,6 +181,8 @@
       try {
         // Get the record object and make it available to the scope
         scope.record = JSON.parse(attrs.record);
+        // Get the number of views for the record and make it available to the scope
+        scope.recordViews = JSON.parse(attrs.recordViews);
         // Broadcast the love
         scope.$broadcast('cds.record.init');
       } catch(error) {
@@ -190,6 +192,13 @@
               scope.record = response.data;
               // Broadcast
               scope.$broadcast('cds.record.init');
+            }, function(error) {
+              // Throw the error
+              scope.$broadcast('cds.record.error', error);
+            });
+          $http.get(attrs.recordViews)
+            .then(function(response) {
+              scope.recordViews = response.data;
             }, function(error) {
               // Throw the error
               scope.$broadcast('cds.record.error', error);
