@@ -230,7 +230,7 @@
       controller: 'cdsRecordCtrl',
       controllerAs: 'vm',
       link: link,
-      templateUrl: templateUrl,
+      templateUrl: templateUrl
     };
   }
 
@@ -240,7 +240,7 @@
 
   // Setup everything
 
-  angular.module('cdsRecord.directives', [])
+  angular.module('cdsRecord.directives', ['ngSanitize'])
     .directive('cdsRecordView', cdsRecordView);
 
   angular.module('cdsRecord.controllers', [])
