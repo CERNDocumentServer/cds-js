@@ -20,7 +20,7 @@
  * waive the privileges and immunities granted to it by virtue of its status
  * as an Intergovernmental Organization or submit itself to any jurisdiction.
  */
-(function (angular) {
+(function (angular, $http) {
   // Controllers
 
   /**
@@ -30,7 +30,7 @@
     * @description
     *    CDS record controller.
     */
-  function cdsRecordController($scope, $sce) {
+  function cdsRecordController($scope, $sce, $http) {
 
     // Parameters
 
@@ -122,6 +122,35 @@
       vm.cdsRecordWarning = warning;
     }
 
+    $scope.logMediaDownload = function (fileObj) {
+      if (!$scope.mediaDownloadEventUrl) {
+        return;
+      }
+
+      var quality = fileObj.context_type === 'master' ? 'master' : fileObj.tags.preset_quality,
+          replacedUrl = replaceUrlParams($scope.mediaDownloadEventUrl, $scope.record.metadata, fileObj.key, quality);
+
+      $http.get(replacedUrl)
+        .then(function(response) {
+        })
+        .then(function(error) {
+        });
+
+      function replaceUrlParams(url, recordMetadata, filename, quality) {
+        var reportNumber = recordMetadata.hasOwnProperty('report_number') &&
+              recordMetadata.report_number.length > 0 ? recordMetadata.report_number[0] : '',
+            filenameParts = filename.split('.'),
+            filenamePartsCount = filenameParts.length,
+            fileFormat = filenamePartsCount > 1 ? filenameParts[filenamePartsCount - 1] : '';
+
+        return url
+          .replace('{recid}', recordMetadata.recid)
+          .replace('{report_number}', reportNumber)
+          .replace('{format}', fileFormat)
+          .replace('{quality}', quality);
+      }
+    };
+
     ////////////
 
     // Assignements
@@ -147,7 +176,7 @@
     $scope.$on('cds.record.loading.stop', cdsRecordLoadingStop);
   }
 
-  cdsRecordController.$inject = ['$scope', '$sce'];
+  cdsRecordController.$inject = ['$scope', '$sce', '$http'];
 
   ////////////
 
@@ -178,6 +207,8 @@
       * @param {cdsRecordCtrl} vm - CERN Document Server record controller.
       */
     function link(scope, element, attrs, vm) {
+      scope.mediaDownloadEventUrl = attrs.mediaDownloadEventUrl;
+
       try {
         // Get the record object and make it available to the scope
         scope.record = JSON.parse(attrs.record);
