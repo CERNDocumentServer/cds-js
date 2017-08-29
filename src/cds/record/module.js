@@ -128,28 +128,29 @@
       }
 
       var quality = fileObj.context_type === 'master' ? 'master' : fileObj.tags.preset_quality,
-          replacedUrl = replaceUrlParams($scope.mediaDownloadEventUrl, $scope.record.metadata, fileObj.key, quality);
+          replacedUrl = replaceMediaDownloadUrlParams($scope.mediaDownloadEventUrl, $scope.record.metadata, fileObj.key, quality);
 
       $http.get(replacedUrl)
         .then(function(response) {
         })
         .then(function(error) {
         });
-
-      function replaceUrlParams(url, recordMetadata, filename, quality) {
-        var reportNumber = recordMetadata.hasOwnProperty('report_number') &&
-              recordMetadata.report_number.length > 0 ? recordMetadata.report_number[0] : '',
-            filenameParts = filename.split('.'),
-            filenamePartsCount = filenameParts.length,
-            fileFormat = filenamePartsCount > 1 ? filenameParts[filenamePartsCount - 1] : '';
-
-        return url
-          .replace('{recid}', recordMetadata.recid)
-          .replace('{report_number}', reportNumber)
-          .replace('{format}', fileFormat)
-          .replace('{quality}', quality);
-      }
     };
+
+    function replaceMediaDownloadUrlParams(url, recordMetadata, filename, quality) {
+      var reportNumber = recordMetadata.hasOwnProperty('report_number') &&
+            recordMetadata.report_number instanceof Array &&
+            recordMetadata.report_number.length > 0 ? recordMetadata.report_number[0] : '',
+          filenameParts = filename.split('.'),
+          filenamePartsCount = filenameParts.length,
+          fileFormat = filenamePartsCount > 1 ? filenameParts[filenamePartsCount - 1] : '';
+
+      return url
+        .replace('{recid}', recordMetadata.recid)
+        .replace('{report_number}', reportNumber)
+        .replace('{format}', fileFormat)
+        .replace('{quality}', quality);
+    }
 
     ////////////
 
@@ -206,39 +207,26 @@
       * @param {service} attrs - Attribute of this element.
       * @param {cdsRecordCtrl} vm - CERN Document Server record controller.
       */
-    function link(scope, element, attrs, vm) {
-      scope.mediaDownloadEventUrl = attrs.mediaDownloadEventUrl;
+      function link(scope, element, attrs, vm) {
+        scope.mediaDownloadEventUrl = attrs.mediaDownloadEventUrl;
 
-      try {
         // Get the record object and make it available to the scope
-        scope.record = JSON.parse(attrs.record);
+        $http.get(attrs.record)
+          .then(function(response) {
+            scope.record = response.data;
+            scope.$broadcast('cds.record.init');
+          }, function(error) {
+            scope.$broadcast('cds.record.error', error);
+          });
+
         // Get the number of views for the record and make it available to the scope
-        scope.recordViews = JSON.parse(attrs.recordViews);
-        // Broadcast the love
-        scope.$broadcast('cds.record.init');
-      } catch(error) {
-        if ((attrs.record || '').charAt(0) === '/') {
-          $http.get(attrs.record)
-            .then(function(response) {
-              scope.record = response.data;
-              // Broadcast
-              scope.$broadcast('cds.record.init');
-            }, function(error) {
-              // Throw the error
-              scope.$broadcast('cds.record.error', error);
-            });
-          $http.get(attrs.recordViews)
-            .then(function(response) {
-              scope.recordViews = response.data;
-            }, function(error) {
-              // Throw the error
-              scope.$broadcast('cds.record.error', error);
-            });
-        } else {
-          scope.$broadcast('cds.record.error', error);
-        }
+        $http.get(attrs.recordViews)
+          .then(function(response) {
+            scope.recordViews = response.data;
+          }, function(error) {
+            scope.$broadcast('cds.record.error', error);
+          });
       }
-    }
 
     /**
       * Choose template for search bar
