@@ -73,8 +73,11 @@ module.exports = function(config) {
 
     // Coverage reporter
     coverageReporter: {
-      type: 'lcov',
-      dir: 'coverage/'
+      dir: 'coverage/',
+      reporters: [
+        { type: 'lcov' },
+        { type: 'text' } // print converage in console
+      ]
     },
 
 

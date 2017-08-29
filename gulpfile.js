@@ -24,7 +24,7 @@
 var gulp = require('gulp');
 var del = require('del');
 var fs = require('fs');
-var karma = require('karma').server;
+var KarmaServer = require('karma').Server;
 var path = require('path');
 var plugins = require('gulp-load-plugins')();
 var runSequence = require('run-sequence');
@@ -114,10 +114,10 @@ gulp.task('test.jshint', function() {
 
 // test sources
 gulp.task('test.src', function(done) {
-  karma.start({
+  new KarmaServer({
     configFile: __dirname + '/karma-src.conf.js',
     singleRun: true
-  }, done);
+  }, done).start();
 });
 
 // coveralls
