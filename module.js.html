@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
     <title>module.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
@@ -23,7 +24,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="cdsRecordController.html">cdsRecordController</a><ul class='methods'><li data-type='method'><a href="cdsRecordController.html#.cdsRecordError">cdsRecordError</a></li><li data-type='method'><a href="cdsRecordController.html#.cdsRecordIframe">cdsRecordIframe</a></li><li data-type='method'><a href="cdsRecordController.html#.cdsRecordInit">cdsRecordInit</a></li><li data-type='method'><a href="cdsRecordController.html#.cdsRecordLoadingStart">cdsRecordLoadingStart</a></li><li data-type='method'><a href="cdsRecordController.html#.cdsRecordLoadingStop">cdsRecordLoadingStop</a></li><li data-type='method'><a href="cdsRecordController.html#.cdsRecordWarn">cdsRecordWarn</a></li></ul></li><li><a href="cdsRecordView.html">cdsRecordView</a><ul class='methods'><li data-type='method'><a href="cdsRecordView.html#.link">link</a></li><li data-type='method'><a href="cdsRecordView.html#.templateUrl">templateUrl</a></li></ul></li></ul>
+    <li class="nav-link nav-home-link"><a href="index.html">Home</a></li><li class="nav-heading">Namespaces</li><li class="nav-heading"><span class="nav-item-type type-namespace">N</span><span class="nav-item-name"><a href="cdsRecordController.html">cdsRecordController</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="cdsRecordController.html#.cdsRecordError">cdsRecordError</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="cdsRecordController.html#.cdsRecordIframe">cdsRecordIframe</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="cdsRecordController.html#.cdsRecordInit">cdsRecordInit</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="cdsRecordController.html#.cdsRecordLoadingStart">cdsRecordLoadingStart</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="cdsRecordController.html#.cdsRecordLoadingStop">cdsRecordLoadingStop</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="cdsRecordController.html#.cdsRecordWarn">cdsRecordWarn</a></span></li><li class="nav-heading"><span class="nav-item-type type-namespace">N</span><span class="nav-item-name"><a href="cdsRecordView.html">cdsRecordView</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="cdsRecordView.html#.link">link</a></span></li><li class="nav-item"><span class="nav-item-type type-function">F</span><span class="nav-item-name"><a href="cdsRecordView.html#.templateUrl">templateUrl</a></span></li>
 </nav>
 
 <div id="main">
@@ -60,7 +61,7 @@
  * waive the privileges and immunities granted to it by virtue of its status
  * as an Intergovernmental Organization or submit itself to any jurisdiction.
  */
-(function (angular) {
+(function (angular, $http) {
   // Controllers
 
   /**
@@ -70,7 +71,7 @@
     * @description
     *    CDS record controller.
     */
-  function cdsRecordController($scope, $sce) {
+  function cdsRecordController($scope, $sce, $http) {
 
     // Parameters
 
@@ -162,6 +163,41 @@
       vm.cdsRecordWarning = warning;
     }
 
+    $scope.logMediaDownload = function (fileObj) {
+      if (!$scope.mediaDownloadEventUrl) {
+        return;
+      }
+
+      var quality = fileObj.context_type === 'master' ? 'master' : fileObj.tags.preset_quality,
+          replacedUrl = replaceMediaDownloadUrlParams(
+            $scope.mediaDownloadEventUrl,
+            $scope.record.metadata,
+            fileObj.key,
+            quality
+          );
+
+        $http.get(replacedUrl)
+        .then(function(response) {
+        })
+        .then(function(error) {
+        });
+    };
+
+    function replaceMediaDownloadUrlParams(url, recordMetadata, filename, quality) {
+      var reportNumber = recordMetadata.hasOwnProperty('report_number') &amp;&amp;
+            recordMetadata.report_number instanceof Array &amp;&amp;
+            recordMetadata.report_number.length > 0 ? recordMetadata.report_number[0] : '',
+          filenameParts = filename.split('.'),
+          filenamePartsCount = filenameParts.length,
+          fileFormat = filenamePartsCount > 1 ? filenameParts[filenamePartsCount - 1] : '';
+
+      return url
+        .replace('{recid}', recordMetadata.recid)
+        .replace('{report_number}', reportNumber)
+        .replace('{format}', fileFormat)
+        .replace('{quality}', quality);
+    }
+
     ////////////
 
     // Assignements
@@ -187,7 +223,7 @@
     $scope.$on('cds.record.loading.stop', cdsRecordLoadingStop);
   }
 
-  cdsRecordController.$inject = ['$scope', '$sce'];
+  cdsRecordController.$inject = ['$scope', '$sce', '$http'];
 
   ////////////
 
@@ -217,28 +253,26 @@
       * @param {service} attrs - Attribute of this element.
       * @param {cdsRecordCtrl} vm - CERN Document Server record controller.
       */
-    function link(scope, element, attrs, vm) {
-      try {
+      function link(scope, element, attrs, vm) {
+        scope.mediaDownloadEventUrl = attrs.mediaDownloadEventUrl;
+
         // Get the record object and make it available to the scope
-        scope.record = JSON.parse(attrs.record);
-        // Broadcast the love
-        scope.$broadcast('cds.record.init');
-      } catch(error) {
-        if ((attrs.record || '').charAt(0) === '/') {
-          $http.get(attrs.record)
-            .then(function(response) {
-              scope.record = response.data;
-              // Broadcast
-              scope.$broadcast('cds.record.init');
-            }, function(error) {
-              // Throw the error
-              scope.$broadcast('cds.record.error', error);
-            });
-        } else {
-          scope.$broadcast('cds.record.error', error);
-        }
+        $http.get(attrs.record)
+          .then(function(response) {
+            scope.record = response.data;
+            scope.$broadcast('cds.record.init');
+          }, function(error) {
+            scope.$broadcast('cds.record.error', error);
+          });
+
+        // Get the number of views for the record and make it available to the scope
+        $http.get(attrs.recordViews)
+          .then(function(response) {
+            scope.recordViews = response.data;
+          }, function(error) {
+            scope.$broadcast('cds.record.error', error);
+          });
       }
-    }
 
     /**
       * Choose template for search bar
@@ -297,7 +331,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Tue Apr 04 2017 15:35:50 GMT+0000 (UTC) using the Minami theme.
+    Generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.4</a> on Wed Aug 30 2017 11:56:29 GMT+0000 (UTC) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
