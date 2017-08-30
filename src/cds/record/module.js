@@ -128,9 +128,14 @@
       }
 
       var quality = fileObj.context_type === 'master' ? 'master' : fileObj.tags.preset_quality,
-          replacedUrl = replaceMediaDownloadUrlParams($scope.mediaDownloadEventUrl, $scope.record.metadata, fileObj.key, quality);
+          replacedUrl = replaceMediaDownloadUrlParams(
+            $scope.mediaDownloadEventUrl,
+            $scope.record.metadata,
+            fileObj.key,
+            quality
+          );
 
-      $http.get(replacedUrl)
+        $http.get(replacedUrl)
         .then(function(response) {
         })
         .then(function(error) {
